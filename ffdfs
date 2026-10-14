@@ -1,0 +1,63 @@
+
+#include <bits/stdc++.h>
+using namespace std;
+
+typedef long long ll;
+
+int nodes, edges, source, sink;
+ll capacity[105][105];
+bool visited[105];
+
+ll findPath(int current, ll pushed) {
+    if (current == sink) {
+        return pushed;
+    }
+
+    visited[current] = true;
+
+    for (int next = 0; next < nodes; next++) {
+        if (visited[next] || capacity[current][next] <= 0) {
+            continue;
+        }
+
+        ll amount = findPath(next, min(pushed, capacity[current][next]));
+
+        if (amount > 0) {
+            capacity[current][next] -= amount;
+            capacity[next][current] += amount;
+            return amount;
+        }
+    }
+
+    return 0;
+}
+
+int main() {
+    cin >> nodes >> edges >> source >> sink;
+
+    for (int i = 0; i < edges; i++) {
+        int from, to;
+        ll limit;
+
+        cin >> from >> to >> limit;
+        capacity[from][to] += limit;
+    }
+
+    ll maxFlow = 0;
+
+    while (true) {
+        memset(visited, false, sizeof(visited));
+
+        ll addedFlow = findPath(source, LLONG_MAX);
+
+        if (addedFlow == 0) {
+            break;
+        }
+
+        maxFlow += addedFlow;
+    }
+
+    cout << maxFlow << '\n';
+
+    return 0;
+}
